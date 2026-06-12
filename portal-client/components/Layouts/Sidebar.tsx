@@ -35,7 +35,7 @@ const NAV_LINKS: NavLink[] = [
   {
     key: "home",
     name: "Home",
-    path: "/",
+    path: "/home",
     roles: [Role.Editor, Role.Operations, Role["Pod Head"]],
   },
   {
@@ -63,21 +63,22 @@ const NAV_LINKS: NavLink[] = [
 // ---------------------------------------------------------------------------
 
 function NavItems({ roleName }: { roleName: Role }) {
-  console.log("🚀 ~ NavItems ~ roleName:", roleName)
   const router = useRouter()
   const pathName = usePathname()
-  const [, setPathRendered] = useState(pathName)
 
-  // Only keep links whose roles array includes the current user's role
   const allowedLinks = NAV_LINKS.filter((link) => link.roles.includes(roleName))
 
   const onRoute = useCallback(
     (path: string) => {
       router.replace(path)
-      setPathRendered(path)
     },
     [router]
   )
+
+  const isActive = (path: string) => {
+    if (path === "/") return pathName === "/"
+    return pathName === path || pathName.startsWith(`${path}/`)
+  }
 
   return (
     <nav className="flex flex-col gap-1">
@@ -85,7 +86,7 @@ function NavItems({ roleName }: { roleName: Role }) {
         <Button
           key={item.key}
           onClick={() => onRoute(item.path)}
-          variant={pathName === item.path ? "default" : "secondary"}
+          variant={isActive(item.path) ? "default" : "secondary"}
           className="cursor-pointer"
         >
           {item.name}
@@ -108,7 +109,7 @@ export default function Sidebar({ children, userData, roleName }: Props) {
     } catch (error) {
       console.error("Logout error:", error)
     } finally {
-      router.replace("/login")
+      router.replace("/")
     }
   }
 

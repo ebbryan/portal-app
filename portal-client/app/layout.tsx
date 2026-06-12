@@ -1,14 +1,9 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 import { cn } from "../lib/utils"
 import { ThemeProvider } from "../components/theme-provider"
 import { Toaster } from "../components/ui/sonner"
-import { readCurrentUser } from "@/requests/auth.request"
-import { TUser } from "@/types/User.type"
-import ConditionalLayout from "./layout.content"
-import { getServerSession } from "@/helpers/JwtDecoder"
-import { Role } from "@/enums/role"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -28,8 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const userData = (await readCurrentUser()).data as TUser
-
   return (
     <html
       lang="en"
@@ -43,9 +36,7 @@ export default async function RootLayout({
     >
       <body>
         <Toaster />
-        <ThemeProvider>
-          <ConditionalLayout userData={userData}>{children}</ConditionalLayout>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

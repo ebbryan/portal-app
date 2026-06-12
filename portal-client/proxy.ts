@@ -3,8 +3,8 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { jwtDecode, JwtPayload } from "jwt-decode"
 
-export const privateRoutes = ["/", "/profile", "/pod-heads", "/editors"]
-export const publicRoutes = ["/login"]
+export const privateRoutes = ["/home", "/profile", "/pod-heads", "/editors"]
+export const publicRoutes = ["/"]
 
 const isTokenValid = (token?: string): boolean => {
   if (!token) return false
@@ -39,13 +39,13 @@ export function proxy(request: NextRequest) {
   )
 
   if (isPrivateRoute && !hasValidAccessToken) {
-    console.log("Unauthenticated > Redirecting to /login")
-    return NextResponse.redirect(new URL("/login", request.nextUrl))
+    console.log("Unauthenticated > Redirecting to /")
+    return NextResponse.redirect(new URL("/", request.nextUrl))
   }
 
   if (isPublicRoute && hasValidAccessToken) {
-    console.log("Already authenticated > Redirecting to /dashboard")
-    return NextResponse.redirect(new URL("/", request.nextUrl))
+    console.log("Already authenticated > Redirecting to /home")
+    return NextResponse.redirect(new URL("/home", request.nextUrl))
   }
 
   return NextResponse.next()
