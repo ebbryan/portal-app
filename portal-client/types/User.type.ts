@@ -1,4 +1,4 @@
-export type User = {
+export type TUser = {
   first_name: string
   username: string
   last_name: string

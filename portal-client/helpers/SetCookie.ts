@@ -17,3 +17,9 @@ export const setCookie = async (accessToken: string, refreshToken: string) => {
     maxAge: 60 * 60 * 24 * 7,
   })
 }
+
+export const destructCookies = async () => {
+  const cookieStore = await cookies()
+  cookieStore.delete("access_token")
+  cookieStore.delete("refresh_token")
+}

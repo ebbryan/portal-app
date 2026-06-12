@@ -4,6 +4,9 @@ import "./globals.css"
 import { cn } from "../lib/utils"
 import { ThemeProvider } from "../components/theme-provider"
 import { Toaster } from "../components/ui/sonner"
+import { readCurrentUser } from "@/requests/auth.request"
+import { TUser } from "@/types/User.type"
+import ConditionalLayout from "./layout.content"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -18,11 +21,12 @@ export const metadata = {
     "Portal is a powerful tool for managing your creative projects, providing a seamless experience for collaboration and organization. With its intuitive interface and robust features, Portal helps you stay on top of your work and bring your creative visions to life.",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const userData = (await readCurrentUser()).data as TUser
   return (
     <html
       lang="en"
@@ -36,7 +40,9 @@ export default function RootLayout({
     >
       <body>
         <Toaster />
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ConditionalLayout userData={userData}>{children}</ConditionalLayout>
+        </ThemeProvider>
       </body>
     </html>
   )

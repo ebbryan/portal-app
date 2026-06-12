@@ -1,8 +1,10 @@
-import { readUsers } from "@directus/sdk"
+import { logout, readMe, readUsers, withToken } from "@directus/sdk"
 import { directusClient } from "../lib/directus"
-import { User } from "../types/User.type"
+
 import { TAuthToken } from "../types/Auth.type"
-import { setCookie } from "../helpers/SetCookie"
+import { destructCookies, setCookie } from "../helpers/SetCookie"
+import { TUser } from "@/types/User.type"
+import { cookieTokenGrabber } from "@/helpers/CookieGrabber"
 
 export async function login(username: string, password: string) {
   try {
@@ -10,7 +12,7 @@ export async function login(username: string, password: string) {
       readUsers({
         filter: { username: { _eq: username } },
       })
-    )) as User[]
+    )) as TUser[]
 
     if (user.length === 0) {
       return { success: false, message: "User not found" }
@@ -32,5 +34,37 @@ export async function login(username: string, password: string) {
   } catch (error) {
     return { success: false, message: "Login failed" }
   }
-  //   const result = await directusClient.login({ email, password })
+}
+
+export const logoutUser = async () => {
+  const { refreshToken } = await cookieTokenGrabber()
+  if (!refreshToken) {
+    destructCookies()
+    return
+  }
+
+  try {
+    await directusClient.request(
+      logout({ refresh_token: refreshToken, mode: "json" })
+    )
+    return { message: "Logout successful", success: true }
+  } catch (error) {
+    console.error("Logout request failed:", error) // <-- will tell you the real reason
+    // Still destroy cookies so the user is logged out locally
+    // even if the server request fails
+  } finally {
+    destructCookies()
+  }
+}
+
+export async function readCurrentUser() {
+  try {
+    const { accessToken } = await cookieTokenGrabber()
+    const response = (await directusClient.request(
+      withToken(accessToken, readMe())
+    )) as TUser
+    return { success: true, data: response }
+  } catch (error) {
+    return { success: false, message: "Failed to fetch user data" }
+  }
 }
