@@ -5,5 +5,26 @@
     "description": "$t:admin_description",
     "parent": null,
     "_syncId": "_sync_default_admin_role"
+  },
+  {
+    "name": "Pod Head",
+    "icon": "supervised_user_circle",
+    "description": null,
+    "parent": null,
+    "_syncId": "1dd14c1b-af2d-4565-8a75-c04c2bdbe51a"
+  },
+  {
+    "name": "Editor",
+    "icon": "supervised_user_circle",
+    "description": null,
+    "parent": null,
+    "_syncId": "4102f2ef-83a4-49a7-8916-54aa33b3fab6"
+  },
+  {
+    "name": "Operations",
+    "icon": "supervised_user_circle",
+    "description": null,
+    "parent": null,
+    "_syncId": "8da91e2b-a767-4c01-aede-a25c612fa03b"
   }
 ]
