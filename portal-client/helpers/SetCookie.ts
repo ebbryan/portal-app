@@ -8,7 +8,7 @@ export const setCookie = async (accessToken: string, refreshToken: string) => {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
-    maxAge: 120 * 120,
+    maxAge: 60 * 60 * 2,
   })
   cookieStore.set("refresh_token", refreshToken, {
     httpOnly: true,

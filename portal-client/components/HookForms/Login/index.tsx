@@ -17,8 +17,10 @@ import { loginSchema, TLogin } from "../../../schemas/user-auth.schema"
 import { toast } from "sonner"
 import { Field, FieldError, FieldGroup, FieldLabel } from "../../ui/field"
 import { login } from "../../../requests/auth.request"
+import { useRouter } from "next/navigation"
 
 export default function Login() {
+  const router = useRouter()
   const loginForm = useForm<TLogin>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -33,6 +35,8 @@ export default function Login() {
       toast.error(response.message)
       return
     }
+
+    router.push("/dashboard")
 
     loginForm.reset()
   }
