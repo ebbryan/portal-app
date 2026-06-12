@@ -1,0 +1,43 @@
+{
+  "name": "directus-extension-sync",
+  "description": "This extension exposes routes to manage id mapping for Directus sync.",
+  "icon": "extension",
+  "version": "3.0.6",
+  "author": "Edouard Demotes-Mainard <edouard@tractr.net>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tractr/directus-sync.git"
+  },
+  "license": "GPL-3.0",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-custom-endpoint"
+  ],
+  "type": "module",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "dist/index.js",
+    "source": "src/index.ts",
+    "host": "^11.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify",
+    "link": "directus-extension link",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "17.1.2",
+    "@types/http-errors": "^2.0.4",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.1",
+    "http-errors": "^2.0.0",
+    "jest": "^29.7.0",
+    "pino": "^9.6.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.3",
+    "zod": "^4.1.11"
+  },
+  "gitHead": "b5b77a1a06c47da8f6475ee60d7af184893fd915"
+}

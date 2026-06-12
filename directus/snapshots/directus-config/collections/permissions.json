@@ -1,0 +1,21 @@
+[
+  {
+    "collection": "directus_users",
+    "action": "read",
+    "permissions": null,
+    "validation": null,
+    "presets": null,
+    "fields": [
+      "first_name",
+      "username",
+      "last_name",
+      "email",
+      "role",
+      "status",
+      "id",
+      "last_access"
+    ],
+    "policy": "_sync_default_public_policy",
+    "_syncId": "2247c084-aa41-482a-a037-87e6222ce6a5"
+  }
+]

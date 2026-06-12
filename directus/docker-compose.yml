@@ -1,0 +1,46 @@
+services:
+  database:
+    image: postgres:17
+    container_name: pgdatabase
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "directus"
+      POSTGRES_PASSWORD: "directus"
+      POSTGRES_DB: "directus"
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+  directus:
+    image: directus/directus:11.5.1
+    ports:
+      - 8055:8055
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    environment:
+      KEY: "directus-key"
+      SECRET: "directus-secret"
+      DB_CLIENT: "pg"
+      DB_HOST: "pgdatabase"
+      DB_PORT: "5432"
+      DB_DATABASE: "directus"
+      DB_USER: "directus"
+      DB_PASSWORD: "directus"
+      ADMIN_EMAIL: "admin@portal.com"
+      ADMIN_PASSWORD: "admin123"
+      EXTENSIONS_AUTO_RELOAD: true
+      EXTENSIONS_MUST_LOAD: true
+      WEBSOCKETS_ENABLED: false
+      CORS_ENABLED: true
+      CORS_ORIGIN: "*"
+      CORS_ALLOWED_METHODS: GET,POST,PATCH,PUT,DELETE
+      CORS_ALLOWED_HEADERS: Content-Type,X-CSRF
+      IMPORT_IP_DENY_LIST: ::1,127.0.0.1
+      PUBLIC_URL: "http://localhost:8055"
+      MARKETPLACE_TRUST: "all"
+      TZ: "Asia/Manila"
+
+volumes:       
+  local_pgdata:
