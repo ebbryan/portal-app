@@ -7,6 +7,8 @@ import { Toaster } from "../components/ui/sonner"
 import { readCurrentUser } from "@/requests/auth.request"
 import { TUser } from "@/types/User.type"
 import ConditionalLayout from "./layout.content"
+import { getServerSession } from "@/helpers/JwtDecoder"
+import { Role } from "@/enums/role"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -27,6 +29,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const userData = (await readCurrentUser()).data as TUser
+
   return (
     <html
       lang="en"

@@ -1,72 +1,107 @@
 "use client"
 
-import { TUser } from "@/types/User.type"
-import { Button } from "../ui/button"
-import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
-import { Separator } from "../ui/separator"
+import { useRouter, usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Role } from "@/enums/role"
 import { logoutUser } from "@/requests/auth.request"
-import { directusClient } from "@/lib/directus"
 
-type Props = {
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface Props {
   children: React.ReactNode
-  userData?: TUser
+  userData?: {
+    first_name?: string
+    last_name?: string
+  }
+  roleName: Role // role_name from getServerSession() passed by the parent
 }
 
-function NavItems() {
+interface NavLink {
+  key: string
+  name: string
+  path: string
+  roles: Role[]
+}
+
+// ---------------------------------------------------------------------------
+// Nav config
+// ---------------------------------------------------------------------------
+
+const NAV_LINKS: NavLink[] = [
+  {
+    key: "home",
+    name: "Home",
+    path: "/",
+    roles: [Role.Editor, Role.Operations, Role["Pod Head"]],
+  },
+  {
+    key: "profile",
+    name: "Profile",
+    path: "/profile",
+    roles: [Role.Editor, Role.Operations, Role["Pod Head"]],
+  },
+  {
+    key: "manage-heads",
+    name: "Pod Heads",
+    path: "/pod-heads",
+    roles: [Role.Operations],
+  },
+  {
+    key: "manage-editors",
+    name: "Editors",
+    path: "/editors",
+    roles: [Role.Operations],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// NavItems
+// ---------------------------------------------------------------------------
+
+function NavItems({ roleName }: { roleName: Role }) {
+  console.log("🚀 ~ NavItems ~ roleName:", roleName)
   const router = useRouter()
   const pathName = usePathname()
-  const [pathRendered, setPathRendered] = useState(pathName)
+  const [, setPathRendered] = useState(pathName)
 
-  const navLinks = [
-    {
-      key: "home",
-      name: "Home",
-      path: "/",
-    },
-    {
-      key: "profile",
-      name: "Profile",
-      path: "/profile",
-    },
-    {
-      key: "manage-heads",
-      name: "Pod Heads",
-      path: "/pod-heads",
-    },
-    {
-      key: "manage-editors",
-      name: "Editors",
-      path: "/editors",
-    },
-  ]
+  // Only keep links whose roles array includes the current user's role
+  const allowedLinks = NAV_LINKS.filter((link) => link.roles.includes(roleName))
 
   const onRoute = useCallback(
     (path: string) => {
       router.replace(path)
-      setPathRendered(pathName)
+      setPathRendered(path)
     },
-    [pathRendered]
+    [router]
   )
 
   return (
     <nav className="flex flex-col gap-1">
-      {navLinks.map((items) => (
+      {allowedLinks.map((item) => (
         <Button
-          key={items.key}
-          onClick={() => onRoute(items.path)}
-          variant={pathName === items.path ? "default" : "secondary"}
+          key={item.key}
+          onClick={() => onRoute(item.path)}
+          variant={pathName === item.path ? "default" : "secondary"}
           className="cursor-pointer"
         >
-          {items.name}
+          {item.name}
         </Button>
       ))}
     </nav>
   )
 }
 
-export default function Sidebar({ children, userData }: Props) {
+// ---------------------------------------------------------------------------
+// Sidebar
+// ---------------------------------------------------------------------------
+
+export default function Sidebar({ children, userData, roleName }: Props) {
   const router = useRouter()
+
   const onLogout = async () => {
     try {
       await logoutUser()
@@ -84,11 +119,11 @@ export default function Sidebar({ children, userData }: Props) {
           Hi! {userData?.first_name} {userData?.last_name}
         </h2>
         <div className="flex flex-col justify-between gap-4">
-          <NavItems />
+          <NavItems roleName={roleName} />
           <Separator />
           <Button
             onClick={onLogout}
-            variant={"destructive"}
+            variant="destructive"
             className="flex-end flex"
           >
             Logout

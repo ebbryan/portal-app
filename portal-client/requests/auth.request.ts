@@ -1,13 +1,29 @@
-import { logout, readMe, readUsers, withToken } from "@directus/sdk"
+"use server"
+import { logout, readMe, readRole, readUsers, withToken } from "@directus/sdk"
 import { directusClient } from "../lib/directus"
 
 import { TAuthToken } from "../types/Auth.type"
 import { destructCookies, setCookie } from "../helpers/SetCookie"
 import { TUser } from "@/types/User.type"
 import { cookieTokenGrabber } from "@/helpers/CookieGrabber"
+import { decodeToken } from "@/helpers/JwtDecoder"
+import { cookies } from "next/headers"
+
+const ROLE_NAME_COOKIE = "role_name"
+
+const setRoleNameCookie = async (roleName: string) => {
+  const cookieStore = await cookies()
+  cookieStore.set(ROLE_NAME_COOKIE, roleName, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  })
+}
 
 export async function login(username: string, password: string) {
   try {
+    // 1. Look up the user by username
     const user = (await directusClient.request(
       readUsers({
         filter: { username: { _eq: username } },
@@ -20,6 +36,7 @@ export async function login(username: string, password: string) {
 
     const userEmail = user[0].email
 
+    // 2. Authenticate and get tokens
     const response = (await directusClient.login({
       email: userEmail,
       password,
@@ -29,7 +46,27 @@ export async function login(username: string, password: string) {
       return { success: false, message: "Invalid credentials" }
     }
 
+    // 3. Decode the access token to extract the role ID
+    //    Directus embeds the role UUID under the `role` claim
+    const payload = await decodeToken<{ role?: string }>(response.access_token)
+    const roleId = payload.role
+
+    // 4. Fetch the role name from directus_roles using the role ID
+    let roleName = "unknown"
+    if (roleId) {
+      try {
+        const role = await directusClient.request(readRole(roleId))
+        roleName = role?.name ?? "unknown"
+      } catch {
+        // Non-fatal — session still works, role name just won't be available
+        console.warn(`Could not fetch role name for role ID: ${roleId}`)
+      }
+    }
+
+    // 5. Store tokens + role name in cookies
     setCookie(response.access_token, response.refresh_token)
+    await setRoleNameCookie(roleName)
+
     return { success: true, data: response }
   } catch (error) {
     return { success: false, message: "Login failed" }
