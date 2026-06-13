@@ -6,7 +6,6 @@ import { getServerSession } from "@/helpers/JwtDecoder"
 
 export default async function HomePage() {
   const session = await getServerSession()
-  console.log("🚀 ~ Page ~ session:", session)
   return (
     <div>
       <h1>Welcome to the Home Page</h1>

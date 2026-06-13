@@ -60,7 +60,6 @@ export const useSession = (): UseSessionReturn => {
   useEffect(() => {
     try {
       const token = getCookieValue("access_token")
-      console.log("🚀 ~ useSession ~ token:", token)
 
       if (!token) {
         setError("No access token found in cookies")
@@ -72,7 +71,6 @@ export const useSession = (): UseSessionReturn => {
 
       // Pick up the role name stored at login time
       const role_name = getCookieValue("role_name") ?? "unknown"
-      console.log("🚀 ~ useSession ~ role_name:", role_name)
 
       setSession({ ...payload, role_name })
       setIsExpired(expired)
